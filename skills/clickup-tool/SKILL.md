@@ -3,9 +3,10 @@ name: clickup-tool
 description: This skill should be used when the user asks to "check my tasks",
   "show ClickUp tasks", "get task details", "view task comments", "show project
   structure", "list sprints", "what am I working on", "show my ClickUp board",
-  "task status", or mentions ClickUp, tasks, sprints, or project management queries.
-  Provides access to ClickUp workspace data through the clickup-tool CLI with
-  normalized, compressed JSON output.
+  "task status", "add a comment", "post a note", "log time", "track time",
+  "delete time entry", or mentions ClickUp, tasks, sprints, or project management
+  queries. Provides read and write access to ClickUp workspace data through the
+  clickup-tool CLI with normalized, compressed JSON output.
 allowed-tools: Bash(clickup-tool *)
 ---
 
@@ -41,6 +42,9 @@ Map user requests to the appropriate command based on intent:
 | Lists in a folder, sprints, iterations | `clickup-tool get-lists FOLDER_ID` |
 | Team members, workspace users, find user ID, "who is on the team" | `clickup-tool get-members` |
 | Auth check, "who am I", verify connection | `clickup-tool get-me` |
+| Post a comment, leave a note on task | `clickup-tool add-comment TASK_ID "text"` |
+| Log time, track work, "I spent 2h on this" | `clickup-tool add-time-entry TASK_ID "2h" --description "work"` |
+| Remove wrong time entry | `clickup-tool delete-time-entry TIMER_ID` |
 
 For exploring workspace structure, chain commands in sequence: start with `get-spaces` to obtain space IDs, then `get-folders SPACE_ID` for folder IDs, then `get-lists FOLDER_ID` to see lists (sprints) within a folder.
 
@@ -100,6 +104,9 @@ Flag values with spaces must be quoted: `--status "in progress"`. All IDs (assig
 | `clickup-tool get-tasks` | see filter flags below | Tasks `[{id, name, status, tags, priority, ...}]` |
 | `clickup-tool get-task TASK_ID` | task_id | Full task with description, checklists, time_entries |
 | `clickup-tool get-comments TASK_ID` | task_id | Comments `[{text, user, date, replies}]` |
+| `clickup-tool add-comment TASK_ID TEXT` | task_id, text, `--notify-all` | `{id, date}` |
+| `clickup-tool add-time-entry TASK_ID DURATION` | task_id, duration, `--description`, `--date` | `{id, task_id, duration, description}` |
+| `clickup-tool delete-time-entry TIMER_ID` | timer_id | `{id, deleted: true}` |
 
 ### get-tasks filter flags
 
