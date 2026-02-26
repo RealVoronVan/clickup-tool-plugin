@@ -1,6 +1,6 @@
 # clickup-tool plugin for Claude Code
 
-ClickUp integration for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — query tasks, comments, sprints, and workspace structure through natural language. Uses the [clickup-tool](https://github.com/RealVoronVan/clickup-tool) CLI under the hood.
+ClickUp integration for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — read and write ClickUp data through natural language. Query tasks, post comments, log time, explore workspace structure. Uses the [clickup-tool](https://github.com/RealVoronVan/clickup-tool) CLI under the hood.
 
 ## Prerequisites
 
@@ -72,23 +72,37 @@ See [config.yaml.example](https://github.com/RealVoronVan/clickup-tool/blob/main
 
 ## Available Commands
 
+### Read
+
 | Command | Description |
 |---------|-------------|
-| `/tasks` | List tasks with filters (assignee, status, tag, list) |
-| `/task TASK_ID` | Full task details with time entries |
-| `/comments TASK_ID` | Task comments with replies |
-| `/spaces` | Workspace spaces, folders, lists hierarchy |
-| `/tags SPACE_ID` | Tags in a space |
-| `/members` | Workspace members |
-| `/me` | Authenticated user info |
+| `/clickup-tool:tasks` | List tasks with filters (assignee, status, tag, list) |
+| `/clickup-tool:task TASK_ID` | Full task details with time entries |
+| `/clickup-tool:comments TASK_ID` | Task comments with replies |
+| `/clickup-tool:spaces` | Workspace spaces and statuses |
+| `/clickup-tool:tags SPACE_ID` | Tags in a space |
+| `/clickup-tool:members` | Workspace members |
+| `/clickup-tool:me` | Authenticated user info |
+
+### Write
+
+| Command | Description |
+|---------|-------------|
+| `/clickup-tool:add-comment TASK_ID` | Post a comment on a task |
+| `/clickup-tool:add-time TASK_ID 2h 30m` | Log time on a task |
+| `/clickup-tool:delete-time TIMER_ID` | Delete a time tracking entry |
+
+Write commands show a preview and ask for confirmation before executing. They have full access to your conversation context — you can say things like "summarize the last commit as a comment on task X" or "figure out how long I worked today and log it".
 
 ## Skill Auto-Trigger
 
-The plugin includes a skill that activates automatically when you mention ClickUp tasks, sprints, or workspace queries in conversation. No slash command needed — just ask naturally:
+The plugin includes a skill that activates automatically when you mention ClickUp tasks, sprints, time tracking, or workspace queries in conversation. No slash command needed — just ask naturally:
 
 - "What are my open tasks?"
 - "Show me sprint 21 tasks"
 - "What comments are on task abc123?"
+- "Log 2 hours on task abc123 for the auth refactoring"
+- "Post a status update on task abc123"
 
 ## Session Hook
 

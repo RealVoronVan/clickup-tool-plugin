@@ -1,7 +1,7 @@
 {
   "name": "clickup-tool",
   "version": "1.0.0",
-  "description": "ClickUp task management integration — query tasks, comments, workspace structure via clickup-tool CLI",
+  "description": "ClickUp task management integration — read and write tasks, comments, time tracking, workspace structure via clickup-tool CLI",
   "author": {
     "name": "RealVoronVan"
   },
