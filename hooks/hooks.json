@@ -1,0 +1,9 @@
+{
+  "hooks": [
+    {
+      "event": "SessionStart",
+      "type": "command",
+      "command": "clickup-tool whoami 2>/dev/null || echo 'ClickUp: not configured (install: https://github.com/RealVoronVan/clickup-tool)'"
+    }
+  ]
+}
