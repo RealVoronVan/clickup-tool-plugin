@@ -1,25 +1,26 @@
 ---
 description: Get full details of a specific ClickUp task including description, checklists, and time tracking
-allowed-tools: Bash(clickup-tool *)
+allowed-tools: Task(clickup-executor)
 argument-hint: <TASK_ID>
-context: fork
-agent: clickup-executor
 ---
 
-Run `clickup-tool get-task $ARGUMENTS` and present full task details.
+Use the **clickup-executor** subagent to fetch and format task details. Do NOT run clickup-tool commands inline.
 
-The argument must be a task ID string (e.g. `86a1b2c3d`). If the user provides a task name instead of ID, first run `clickup-tool get-tasks` to find the task ID. If $ARGUMENTS is empty, ask the user for the task ID or suggest running `/tasks` first to find it.
+If `$ARGUMENTS` is empty, ask the user for the task ID or suggest running `/tasks` first to find it. Otherwise, dispatch the clickup-executor agent with the Task tool, providing the following prompt:
 
-Present task details in this order:
-1. **Header**: name — status — priority
-2. **People**: assignees, creator
-3. **Dates**: due_date, start_date, date_created
-4. **Time**: time_estimate vs time_spent (if present)
-5. **Description**: markdown_description (full text)
-6. **Checklists**: name + resolved/total per checklist, then items
-7. **Custom fields**: name: value pairs
-8. **Attachments**: list with titles and URLs
-9. **Tags**: inline list
-10. **Link**: task URL
+---
 
-Suggest `/comments $ARGUMENTS` for task discussion.
+**Command:** `get-task`
+**Task ID:** $ARGUMENTS
+
+## Instructions
+
+1. If the argument looks like a task name (not an alphanumeric ID), first run `clickup-tool get-tasks` to find the task ID
+2. Run `clickup-tool get-task TASK_ID`
+3. Format the result as structured sections: Header, People, Dates, Time, Description, Checklists, Custom fields, Attachments, Tags, Link
+4. Skip sections where data is absent
+5. Suggest `/comments TASK_ID` for task discussion
+
+---
+
+Present the subagent's summary to the user as-is. Do not re-run the commands yourself.
