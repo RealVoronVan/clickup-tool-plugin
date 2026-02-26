@@ -4,9 +4,9 @@ allowed-tools: Task(clickup-executor)
 argument-hint: "[--status STATUS] [--tag TAG] [--assignee ID] [--list-id ID]"
 ---
 
-Use the **clickup-executor** subagent to fetch and format task data. Do NOT run clickup-tool commands inline.
+Use a **Sonnet** clickup-executor subagent to fetch and format task data. Do NOT run clickup-tool commands inline.
 
-Dispatch the clickup-executor agent with the Task tool, providing the following prompt:
+Dispatch the clickup-executor agent with the Task tool using **model: sonnet**, providing the following prompt:
 
 ---
 
