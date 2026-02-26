@@ -1,6 +1,6 @@
 # ClickUp Tool -- Command Reference
 
-Complete reference for all nine clickup-tool commands. Each section includes syntax, arguments, example invocation, normalized output example, and usage notes.
+Complete reference for all twelve clickup-tool commands (9 read + 3 write). Each section includes syntax, arguments, example invocation, normalized output example, and usage notes.
 
 ---
 
@@ -561,6 +561,125 @@ clickup-tool get-comments abc123def
 - Comment users are simplified to a username string (unlike task users which retain the full `{id, username, initials, email}` object).
 - Field filtering is controlled by `fields.get_comments` in config.yaml. By default, `id` is excluded.
 - If a reply fetch fails, a warning is printed to stderr and an empty replies array is returned for that comment.
+
+---
+
+## add-comment
+
+Post a comment on a task.
+
+### Syntax
+
+```
+clickup-tool add-comment TASK_ID TEXT [--notify-all]
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `TASK_ID` | Yes | The task ID |
+| `TEXT` | Yes | Comment text (quote if it contains spaces) |
+| `--notify-all` | No | Notify all assignees |
+
+### Example Invocation
+
+```bash
+clickup-tool add-comment abc123def "Started working on the OAuth2 integration"
+```
+
+### Example Output
+
+```json
+{"id": "458", "hist_id": "26508", "date": "2026-02-26 15:30"}
+```
+
+### Notes
+
+- The `date` field is normalized from milliseconds to "YYYY-MM-DD HH:MM".
+- Returns the raw API response with date normalization applied.
+- `--notify-all` sends email notifications to all task assignees.
+
+---
+
+## add-time-entry
+
+Log a time tracking entry on a task.
+
+### Syntax
+
+```
+clickup-tool add-time-entry TASK_ID DURATION [--description TEXT] [--date YYYY-MM-DD]
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `TASK_ID` | Yes | The task ID |
+| `DURATION` | Yes | Duration: `"2h 30m"`, `"45m"`, or `"150"` (bare number = minutes) |
+| `--description` | No | Description of the work performed |
+| `--date` | No | Date for the entry (YYYY-MM-DD, defaults to today) |
+
+### Example Invocations
+
+```bash
+clickup-tool add-time-entry abc123def "2h 30m" --description "OAuth2 implementation"
+clickup-tool add-time-entry abc123def "45m" --date 2026-02-25
+clickup-tool add-time-entry abc123def 90
+```
+
+### Example Output
+
+```json
+{"data": {"id": "12345", "task": {"id": "abc123def"}, "duration": 9000000, "description": "OAuth2 implementation", "start": "1740567600000"}}
+```
+
+### Notes
+
+- Requires `team_id` configured in config.yaml.
+- Duration is parsed from human format and sent as milliseconds to the API.
+- The `--date` flag computes midnight of the given date in the configured timezone.
+- Without `--date`, the start time is the current timestamp.
+- Uses the team-scoped endpoint `POST /team/{team_id}/time_entries` (not the legacy per-task endpoint).
+- The response `data` wrapper contains the raw API response. Duration is in milliseconds.
+
+---
+
+## delete-time-entry
+
+Delete a time tracking entry.
+
+### Syntax
+
+```
+clickup-tool delete-time-entry TIMER_ID
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `TIMER_ID` | Yes | The time entry ID (from `get-task` output's `time_entries`) |
+
+### Example Invocation
+
+```bash
+clickup-tool delete-time-entry 12345
+```
+
+### Example Output
+
+```json
+{"data": {"id": "12345", "duration": 3600000}}
+```
+
+### Notes
+
+- Requires `team_id` configured in config.yaml.
+- This action is irreversible — the time entry cannot be recovered.
+- Use `get-task TASK_ID` to see time entry IDs before deleting.
+- Uses the team-scoped endpoint `DELETE /team/{team_id}/time_entries/{timer_id}`.
 
 ---
 

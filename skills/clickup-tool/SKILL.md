@@ -104,9 +104,9 @@ Flag values with spaces must be quoted: `--status "in progress"`. All IDs (assig
 | `clickup-tool get-tasks` | see filter flags below | Tasks `[{id, name, status, tags, priority, ...}]` |
 | `clickup-tool get-task TASK_ID` | task_id | Full task with description, checklists, time_entries |
 | `clickup-tool get-comments TASK_ID` | task_id | Comments `[{text, user, date, replies}]` |
-| `clickup-tool add-comment TASK_ID TEXT` | task_id, text, `--notify-all` | `{id, date}` |
-| `clickup-tool add-time-entry TASK_ID DURATION` | task_id, duration, `--description`, `--date` | `{id, task_id, duration, description}` |
-| `clickup-tool delete-time-entry TIMER_ID` | timer_id | `{id, deleted: true}` |
+| `clickup-tool add-comment TASK_ID TEXT` | task_id, text, `--notify-all` | `{id, hist_id, date}` |
+| `clickup-tool add-time-entry TASK_ID DURATION` | task_id, duration, `--description`, `--date` | `{data: {id, duration, ...}}` |
+| `clickup-tool delete-time-entry TIMER_ID` | timer_id | `{data: {id, ...}}` |
 
 ### get-tasks filter flags
 

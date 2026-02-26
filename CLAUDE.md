@@ -7,9 +7,9 @@ Claude Code plugin for ClickUp task management. Wraps the [clickup-tool](../clic
 ## Project structure
 
 - `.claude-plugin/plugin.json` — plugin manifest (name, version, metadata)
-- `skills/clickup/SKILL.md` — main skill (auto-triggers on ClickUp mentions), ~2000 words
-- `skills/clickup/references/commands.md` — full CLI reference (9 commands with examples)
-- `skills/clickup/references/config-guide.md` — configuration guide
+- `skills/clickup-tool/SKILL.md` — main skill (auto-triggers on ClickUp mentions), ~2000 words
+- `skills/clickup-tool/references/commands.md` — full CLI reference (12 commands with examples)
+- `skills/clickup-tool/references/config-guide.md` — configuration guide
 - `commands/` — 10 slash commands: tasks, task, comments, spaces, tags, members, me, add-comment, add-time, delete-time
 - `agents/task-analyst.md` — autonomous agent for complex multi-step ClickUp queries
 - `hooks/hooks.json` — SessionStart hook (runs `clickup-tool whoami`)
