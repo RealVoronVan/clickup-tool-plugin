@@ -6,7 +6,7 @@ argument-hint: <TASK_ID>
 
 Use the **clickup-executor** subagent to fetch and format comments. Do NOT run clickup-tool commands inline.
 
-If `$ARGUMENTS` is empty, ask the user for the task ID or suggest running `/tasks` first to find it. Otherwise, dispatch the clickup-executor agent with the Task tool, providing the following prompt:
+If `$ARGUMENTS` is empty, ask the user for the task ID or suggest running `/clickup-tool:tasks` first to find it. Otherwise, dispatch the clickup-executor agent with the Task tool, providing the following prompt:
 
 ---
 

@@ -1,12 +1,13 @@
 ---
 description: >
   Execute ClickUp data queries and return structured summaries. Dispatched by
-  /tasks, /task, and /comments commands. Runs in isolated context — only the
-  final summary returns to the main conversation.
+  /clickup-tool:tasks, /clickup-tool:task, and /clickup-tool:comments commands.
+  Runs in isolated context — only the final summary returns to the main
+  conversation.
 
   <example>
   Context: User wants to see their tasks
-  user: "/tasks"
+  user: "/clickup-tool:tasks"
   assistant: "I'll dispatch the clickup-executor agent to fetch and format the task list."
   <commentary>
   Heavy data query — dispatch to clickup-executor to keep raw JSON out of main context.
@@ -15,7 +16,7 @@ description: >
 
   <example>
   Context: User wants task details
-  user: "/task 86abc123"
+  user: "/clickup-tool:task 86abc123"
   assistant: "I'll dispatch the clickup-executor agent to fetch full task details."
   <commentary>
   Single task detail with description, checklists, time entries — dispatch to clickup-executor.
@@ -24,7 +25,7 @@ description: >
 
   <example>
   Context: User asks for task comments
-  user: "/comments 86abc123"
+  user: "/clickup-tool:comments 86abc123"
   assistant: "I'll dispatch the clickup-executor agent to fetch the discussion thread."
   <commentary>
   Comments with replies and attachments — dispatch to clickup-executor.
@@ -61,7 +62,7 @@ Return a markdown table:
 
 After the table, add:
 - Total task count
-- Suggestion: "Run `/task TASK_ID` to see full details for a specific task."
+- Suggestion: "Run `/clickup-tool:task TASK_ID` to see full details for a specific task."
 
 ### get-task
 
@@ -78,7 +79,7 @@ Return structured sections in this order:
 9. **Tags** — tag list
 10. **Link** — ClickUp URL
 
-Skip sections where data is absent. After the details, suggest: "Run `/comments TASK_ID` to see the discussion on this task."
+Skip sections where data is absent. After the details, suggest: "Run `/clickup-tool:comments TASK_ID` to see the discussion on this task."
 
 ### get-comments
 

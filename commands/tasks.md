@@ -28,7 +28,7 @@ Workspace members:
 3. If user mentions "sprint" or "iteration": run `clickup-tool get-spaces` → `clickup-tool get-folders SPACE_ID` → `clickup-tool get-lists FOLDER_ID` to find the list ID
 4. If user mentions a tag: verify exact name with `clickup-tool get-tags SPACE_ID`
 5. Run `clickup-tool get-tasks` with resolved `--flag VALUE` arguments
-6. Format results as a markdown table and suggest `/task TASK_ID` for details
+6. Format results as a markdown table and suggest `/clickup-tool:task TASK_ID` for details
 
 ---
 
