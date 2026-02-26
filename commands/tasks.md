@@ -2,6 +2,8 @@
 description: List ClickUp tasks assigned to me (filter by status, tag, assignee)
 allowed-tools: Bash(clickup-tool *)
 argument-hint: "[--status STATUS] [--tag TAG] [--assignee ID] [--list-id ID]"
+context: fork
+agent: clickup-executor
 ---
 
 ## Available statuses and members

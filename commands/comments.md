@@ -2,6 +2,8 @@
 description: Get comments and discussion on a ClickUp task
 allowed-tools: Bash(clickup-tool *)
 argument-hint: <TASK_ID>
+context: fork
+agent: clickup-executor
 ---
 
 Run `clickup-tool get-comments $ARGUMENTS` and present the comments.

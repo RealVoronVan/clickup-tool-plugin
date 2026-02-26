@@ -2,6 +2,8 @@
 description: Get full details of a specific ClickUp task including description, checklists, and time tracking
 allowed-tools: Bash(clickup-tool *)
 argument-hint: <TASK_ID>
+context: fork
+agent: clickup-executor
 ---
 
 Run `clickup-tool get-task $ARGUMENTS` and present full task details.
