@@ -8,17 +8,18 @@ Claude Code plugin for ClickUp task management. Wraps the [clickup-tool](../clic
 
 - `.claude-plugin/plugin.json` — plugin manifest (name, version, metadata)
 - `skills/clickup-tool/SKILL.md` — main skill (auto-triggers on ClickUp mentions), ~2000 words
-- `skills/clickup-tool/references/commands.md` — full CLI reference (12 commands with examples)
+- `skills/clickup-tool/references/commands.md` — full CLI reference (14 commands with examples)
 - `skills/clickup-tool/references/config-guide.md` — configuration guide
-- `commands/` — 10 slash commands: tasks, task, comments, spaces, tags, members, me, add-comment, add-time, delete-time
+- `commands/` — 11 slash commands: tasks, task, comments, spaces, tags, members, me, add-comment, add-time, delete-time, set-status
 - `agents/task-analyst.md` — autonomous agent for complex multi-step ClickUp queries
+- `agents/clickup-executor.md` — isolated executor dispatched by /tasks, /task, /comments commands
 - `hooks/hooks.json` — SessionStart hook (runs `clickup-tool whoami`)
 - `LICENSE` — MIT
 - `README.md` — public-facing installation and usage guide
 
 ## Components
 
-### Skill (`skills/clickup/SKILL.md`)
+### Skill (`skills/clickup-tool/SKILL.md`)
 Auto-triggers when user mentions ClickUp tasks, sprints, or workspace queries. Contains:
 - ClickUp hierarchy and concepts mapping
 - CLI syntax rules (--flag VALUE, never key:value)
@@ -26,7 +27,7 @@ Auto-triggers when user mentions ClickUp tasks, sprints, or workspace queries. C
 - get-tasks vs get-task distinction
 - Status/tag discovery and sprint lookup workflows
 
-References in `skills/clickup/references/` provide detailed examples — loaded on demand.
+References in `skills/clickup-tool/references/` provide detailed examples — loaded on demand.
 
 ### Commands (`commands/*.md`)
 Each file is a slash command. Key conventions:
@@ -50,7 +51,7 @@ SessionStart: runs `clickup-tool whoami` to display connection status.
 
 ## Testing changes
 
-1. Edit files in this repo — symlink at `~/.claude/plugins/clickup-marketplace/clickup` points here
+1. Edit files in this repo — symlink at `~/.claude/plugins/voronvan-marketplace/clickup` points here
 2. Start a new Claude Code session to pick up changes
 3. Test slash commands: `/tasks`, `/task TASK_ID`, etc.
 4. Test skill auto-trigger: ask about ClickUp tasks in natural language
