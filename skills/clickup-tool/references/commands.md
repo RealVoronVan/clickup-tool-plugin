@@ -1,6 +1,6 @@
 # ClickUp Tool -- Command Reference
 
-Complete reference for all fourteen clickup-tool commands (10 read + 4 write). Each section includes syntax, arguments, example invocation, normalized output example, and usage notes.
+Complete reference for all fifteen clickup-tool commands (11 read + 4 write). Each section includes syntax, arguments, example invocation, normalized output example, and usage notes.
 
 ---
 
@@ -717,6 +717,66 @@ clickup-tool get-statuses abc123def
 - Statuses are resolved from the task's **list**, not the space. Lists can override space-level defaults.
 - Internally chains `GET /task/{id}` (to get `list.id`) then `GET /list/{list_id}` (to get `statuses`).
 - Use this before `set-status` to discover valid status names.
+
+---
+
+## get-time-entries
+
+Fetch time tracking entries for the team within a date range. Returns entries across all tasks, grouped by the API.
+
+### Syntax
+
+```
+clickup-tool get-time-entries [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--assignee ID]
+```
+
+### Arguments
+
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--start-date` | No | Start of date range (YYYY-MM-DD). Converted to midnight in configured timezone. Default: API returns last 30 days. |
+| `--end-date` | No | End of date range (YYYY-MM-DD). Converted to end-of-day in configured timezone. |
+| `--assignee` | No | **Numeric user ID**. Falls back to `default_assignee` from config.yaml. |
+
+### Example Invocation
+
+```bash
+clickup-tool get-time-entries --start-date 2026-02-01 --end-date 2026-02-28
+```
+
+### Example Output
+
+```json
+[
+  {
+    "id": "te_001",
+    "task": {"id": "abc123", "name": "Implement login"},
+    "user": "john.doe",
+    "duration": "2h 30m",
+    "start": "2026-02-20 10:00",
+    "description": "OAuth2 integration",
+    "billable": false
+  },
+  {
+    "id": "te_002",
+    "task": {"id": "abc123", "name": "Implement login"},
+    "user": "john.doe",
+    "duration": "1h 30m",
+    "start": "2026-02-21 14:00",
+    "description": "Session management"
+  }
+]
+```
+
+### Notes
+
+- Uses the team-level endpoint `GET /team/{team_id}/time_entries` (not the per-task endpoint).
+- Requires `team_id` configured in config.yaml.
+- Without `--start-date` and `--end-date`, the API returns entries from the last 30 days.
+- A negative duration in the raw API response means a timer is currently running — normalized to `"running"`.
+- Each entry includes the task `{id, name}` it belongs to, enabling grouping by task.
+- Optional fields `description` and `billable` are only included when present.
+- For time entries on a single task, use `get-task TASK_ID` instead (includes `time_entries`).
 
 ---
 

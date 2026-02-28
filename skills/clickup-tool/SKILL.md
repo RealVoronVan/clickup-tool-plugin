@@ -4,7 +4,8 @@ description: This skill should be used when the user asks to "check my tasks",
   "show ClickUp tasks", "get task details", "view task comments", "show project
   structure", "list sprints", "what am I working on", "show my ClickUp board",
   "task status", "add a comment", "post a note", "log time", "track time",
-  "delete time entry", "change status", "set status", "move to in progress",
+  "delete time entry", "time entries", "timesheet", "how much did I work",
+  "change status", "set status", "move to in progress",
   "close task", or mentions ClickUp, tasks, sprints, or project management
   queries. Provides read and write access to ClickUp workspace data through the
   clickup-tool CLI with normalized, compressed JSON output.
@@ -47,6 +48,7 @@ Map user requests to the appropriate command based on intent:
 | Log time, track work, "I spent 2h on this" | `clickup-tool add-time-entry TASK_ID "2h" --description "work"` |
 | Remove wrong time entry | `clickup-tool delete-time-entry TIMER_ID` |
 | Change task status, "move to in progress", "close it" | `clickup-tool get-statuses TASK_ID` then `clickup-tool set-status TASK_ID "status"` |
+| Time entries, timesheet, "how much did I work this week" | `clickup-tool get-time-entries --start-date YYYY-MM-DD --end-date YYYY-MM-DD` |
 | What statuses are available for a task | `clickup-tool get-statuses TASK_ID` |
 
 For exploring workspace structure, chain commands in sequence: start with `get-spaces` to obtain space IDs, then `get-folders SPACE_ID` for folder IDs, then `get-lists FOLDER_ID` to see lists (sprints) within a folder.
@@ -68,6 +70,7 @@ Map common project management terms to ClickUp hierarchy and CLI commands:
 | "workspace", "team" | Space | `get-spaces` |
 | "status" | Status (per-list or per-space) | Use `get-statuses TASK_ID` for exact names, or `get-spaces` for space-level defaults |
 | "tag", "label" | Tag | `get-tags SPACE_ID` for available tags, `get-tasks --tag TAG` to filter |
+| "timesheet", "time report", "hours worked" | Time entries (team-level) | `get-time-entries --start-date X --end-date Y` for period summary |
 | "Jane", person's name | Assignee (numeric ID) | `get-members` to list all workspace users with IDs, or check `assignees[].id` in task output |
 
 **Critical**: Status names must be used exactly as returned by `get-statuses` or `get-spaces` — do NOT guess. All IDs (assignee, list, space) are **numeric** — never use names as IDs.
@@ -110,6 +113,7 @@ Flag values with spaces must be quoted: `--status "in progress"`. All IDs (assig
 | `clickup-tool add-comment TASK_ID TEXT` | task_id, text, `--notify-all` | `{id, hist_id, date}` |
 | `clickup-tool add-time-entry TASK_ID DURATION` | task_id, duration, `--description`, `--date` | `{data: {id, duration, ...}}` |
 | `clickup-tool delete-time-entry TIMER_ID` | timer_id | `{data: {id, ...}}` |
+| `clickup-tool get-time-entries` | `--start-date`, `--end-date`, `--assignee` | Time entries `[{id, task, user, duration, start, description}]` |
 | `clickup-tool get-statuses TASK_ID` | task_id | Status names `["to do", "in progress", ...]` |
 | `clickup-tool set-status TASK_ID STATUS` | task_id, exact status string | Normalized task (same as get-task, no time_entries) |
 
@@ -286,6 +290,16 @@ Always use this deterministic workflow — never guess status names:
 `get-statuses` resolves statuses at the **list level** (not space level), so it returns the correct statuses even when a list overrides space defaults.
 
 On success, `set-status` returns the updated task in the same format as `get-task` (without time_entries). On invalid status, the error message includes the list of available statuses.
+
+## Fetching Time Entries
+
+To see time tracking data for a period:
+
+1. `clickup-tool get-time-entries --start-date 2026-02-01 --end-date 2026-02-28`
+
+Without `--start-date`/`--end-date`, returns entries from the last 30 days. Without `--assignee`, uses `default_assignee` from config.yaml.
+
+For time entries on a **specific task**, use `get-task TASK_ID` instead — it includes `time_entries` in its output.
 
 ## Sprint Task Lookup Workflow
 
