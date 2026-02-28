@@ -1,6 +1,6 @@
 # ClickUp Tool -- Command Reference
 
-Complete reference for all twelve clickup-tool commands (9 read + 3 write). Each section includes syntax, arguments, example invocation, normalized output example, and usage notes.
+Complete reference for all fourteen clickup-tool commands (10 read + 4 write). Each section includes syntax, arguments, example invocation, normalized output example, and usage notes.
 
 ---
 
@@ -680,6 +680,98 @@ clickup-tool delete-time-entry 12345
 - This action is irreversible — the time entry cannot be recovered.
 - Use `get-task TASK_ID` to see time entry IDs before deleting.
 - Uses the team-scoped endpoint `DELETE /team/{team_id}/time_entries/{timer_id}`.
+
+---
+
+## get-statuses
+
+List valid statuses for a task. Resolves statuses at the list level (not space level) by chaining two API calls: fetches the task to find its list, then fetches the list to get its statuses.
+
+### Syntax
+
+```
+clickup-tool get-statuses TASK_ID
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `TASK_ID` | Yes | The task ID to look up statuses for |
+
+### Example Invocation
+
+```bash
+clickup-tool get-statuses abc123def
+```
+
+### Example Output
+
+```json
+["to do", "in progress", "pending approval", "on hold", "completed", "done"]
+```
+
+### Notes
+
+- Returns a plain JSON list of status name strings — no objects, no colors.
+- Statuses are resolved from the task's **list**, not the space. Lists can override space-level defaults.
+- Internally chains `GET /task/{id}` (to get `list.id`) then `GET /list/{list_id}` (to get `statuses`).
+- Use this before `set-status` to discover valid status names.
+
+---
+
+## set-status
+
+Set a task's status.
+
+### Syntax
+
+```
+clickup-tool set-status TASK_ID "STATUS"
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `TASK_ID` | Yes | The task ID to update |
+| `STATUS` | Yes | Exact status name (must match a valid status for the task's list) |
+
+### Example Invocation
+
+```bash
+clickup-tool set-status abc123def "in progress"
+```
+
+### Example Output (success)
+
+```json
+{
+  "id": "abc123def",
+  "name": "Implement login page",
+  "status": {"id": "s2", "status": "in progress"},
+  "assignees": [{"id": "100000001", "username": "john.doe", "initials": "JD", "email": "john@example.com"}],
+  "tags": ["frontend"],
+  "list": {"id": "901234", "name": "Sprint 12"}
+}
+```
+
+### Example Output (invalid status)
+
+```json
+{
+  "error": true,
+  "message": "Status \"in reveiw\" is not valid. Available: to do, in progress, pending approval, on hold, completed, done"
+}
+```
+
+### Notes
+
+- Uses `PUT /task/{task_id}` with `{"status": "..."}` body.
+- Status name must be an **exact string** — use `get-statuses TASK_ID` first to discover valid names.
+- On success, returns the updated task normalized like `get-task` (without `time_entries`).
+- On invalid status (400), fetches and shows available statuses in the error message.
+- On other errors (404, etc.), returns the API error as-is.
 
 ---
 

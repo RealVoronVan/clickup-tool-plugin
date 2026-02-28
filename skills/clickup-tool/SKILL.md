@@ -4,7 +4,8 @@ description: This skill should be used when the user asks to "check my tasks",
   "show ClickUp tasks", "get task details", "view task comments", "show project
   structure", "list sprints", "what am I working on", "show my ClickUp board",
   "task status", "add a comment", "post a note", "log time", "track time",
-  "delete time entry", or mentions ClickUp, tasks, sprints, or project management
+  "delete time entry", "change status", "set status", "move to in progress",
+  "close task", or mentions ClickUp, tasks, sprints, or project management
   queries. Provides read and write access to ClickUp workspace data through the
   clickup-tool CLI with normalized, compressed JSON output.
 allowed-tools: Bash(clickup-tool *)
@@ -45,6 +46,8 @@ Map user requests to the appropriate command based on intent:
 | Post a comment, leave a note on task | `clickup-tool add-comment TASK_ID "text"` |
 | Log time, track work, "I spent 2h on this" | `clickup-tool add-time-entry TASK_ID "2h" --description "work"` |
 | Remove wrong time entry | `clickup-tool delete-time-entry TIMER_ID` |
+| Change task status, "move to in progress", "close it" | `clickup-tool get-statuses TASK_ID` then `clickup-tool set-status TASK_ID "status"` |
+| What statuses are available for a task | `clickup-tool get-statuses TASK_ID` |
 
 For exploring workspace structure, chain commands in sequence: start with `get-spaces` to obtain space IDs, then `get-folders SPACE_ID` for folder IDs, then `get-lists FOLDER_ID` to see lists (sprints) within a folder.
 
@@ -63,11 +66,11 @@ Map common project management terms to ClickUp hierarchy and CLI commands:
 | "sprint", "iteration" | List | `get-lists FOLDER_ID` to find it, `get-tasks --list-id LIST_ID` for tasks |
 | "project", "board" | Folder | `get-folders SPACE_ID` |
 | "workspace", "team" | Space | `get-spaces` |
-| "status" | Status (per-space) | Must use exact name from `get-spaces` (e.g., "in progress", NOT "active") |
+| "status" | Status (per-list or per-space) | Use `get-statuses TASK_ID` for exact names, or `get-spaces` for space-level defaults |
 | "tag", "label" | Tag | `get-tags SPACE_ID` for available tags, `get-tasks --tag TAG` to filter |
 | "Jane", person's name | Assignee (numeric ID) | `get-members` to list all workspace users with IDs, or check `assignees[].id` in task output |
 
-**Critical**: Status names must be used exactly as returned by `get-spaces` — do NOT guess. All IDs (assignee, list, space) are **numeric** — never use names as IDs.
+**Critical**: Status names must be used exactly as returned by `get-statuses` or `get-spaces` — do NOT guess. All IDs (assignee, list, space) are **numeric** — never use names as IDs.
 
 ## CLI Syntax Rules
 
@@ -107,6 +110,8 @@ Flag values with spaces must be quoted: `--status "in progress"`. All IDs (assig
 | `clickup-tool add-comment TASK_ID TEXT` | task_id, text, `--notify-all` | `{id, hist_id, date}` |
 | `clickup-tool add-time-entry TASK_ID DURATION` | task_id, duration, `--description`, `--date` | `{data: {id, duration, ...}}` |
 | `clickup-tool delete-time-entry TIMER_ID` | timer_id | `{data: {id, ...}}` |
+| `clickup-tool get-statuses TASK_ID` | task_id | Status names `["to do", "in progress", ...]` |
+| `clickup-tool set-status TASK_ID STATUS` | task_id, exact status string | Normalized task (same as get-task, no time_entries) |
 
 ### get-tasks filter flags
 
@@ -268,6 +273,19 @@ clickup-tool get-tags SPACE_ID
 ```
 
 Returns a plain list of tag name strings. Use these exact names with `--tag`.
+
+## Changing Task Status
+
+Always use this deterministic workflow — never guess status names:
+
+1. `clickup-tool get-statuses TASK_ID` — returns the exact list of valid statuses for this task's list
+2. Match the user's request to an exact status from the list
+3. If ambiguous (multiple candidates match), ask the user to pick
+4. `clickup-tool set-status TASK_ID "exact status name"`
+
+`get-statuses` resolves statuses at the **list level** (not space level), so it returns the correct statuses even when a list overrides space defaults.
+
+On success, `set-status` returns the updated task in the same format as `get-task` (without time_entries). On invalid status, the error message includes the list of available statuses.
 
 ## Sprint Task Lookup Workflow
 
